@@ -48,14 +48,15 @@ function install_kubectl() {
   fi
 }
 function copy_kube_config() {
-  sudo mkdir /.kube/
-  k8sprivatekey_rsa=".ssh/k8sprivatekey_rsa"
+  kubconfigdir=/home/$vm_user_name/.kube
+  sudo mkdir $kubconfigdir
+  k8sprivatekey_rsa=/home/$vm_user_name/.ssh/k8sprivatekey_rsa
   sudo touch $k8sprivatekey_rsa
-  sudo sh -c "echo ${kubernetes_private_key} > ${k8sprivatekey_rsa}"
-  sudo chmod 600 $k8sprivatekey_rsa
+  echo "${kubernetes_private_key}" | base64 -d | tee ${k8sprivatekey_rsa}
+  sudo chmod 400 $k8sprivatekey_rsa
   sudo mkdir /var/lib/jenkins/.kube/
-  sudo scp -i "${k8sprivatekey_rsa}" -o "StrictHostKeyChecking no" "${kubernetes_user_name}"@"${kubernetes_master_fqdn}":/.kube/config .kube
-  sudo cp /.kube/config /var/lib/jenkins/.kube/config
+  sudo scp -i $k8sprivatekey_rsa -o "StrictHostKeyChecking no" $kubernetes_user_name@$kubernetes_master_fqdn:.kube/config $kubconfigdir
+  sudo cp $kubconfigdir/config /var/lib/jenkins/.kube/config
 }
 # create a k8s registry secrect and bind it with default service account
 function bind_k8s_registry_secret_to_service_account() {
