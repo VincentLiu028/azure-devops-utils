@@ -115,7 +115,7 @@ do
       kubernetes_user_name="$1"
       shift
       ;;
-    --kubernetes_private_key)
+    --kubernetes_private_key|-kpk)
       kubernetes_private_key="$1"
       shift
       ;;                  
