@@ -12,6 +12,9 @@ Arguments
   --registry_password|-rp  [Required] : Registry password
   --repository|-rr         [Required] : Repository targeted by the pipeline
   --jenkins_fqdn|-jf       [Required] : Jenkins FQDN
+  --kubernetes_master_fqdn|-kmf [Required] : Kubernete master FQDN
+  --kubernetes_user_name|-kun [Required] : Kubernete master user name
+  --kubernetes_private_key|-kpk [Required] : kubernetes private key log in to master FQDN
   --artifacts_location|-al            : Url used to reference other scripts/artifacts.
   --sas_token|-st                     : A sas token needed if the artifacts location is private.
 EOF
@@ -36,6 +39,28 @@ function run_util_script() {
     >&2 echo "Failed while executing script '$script_path'."
     exit $return_value
   fi
+}
+function install_kubectl() {
+  if !(command -v kubectl >/dev/null); then
+    kubectl_file="/usr/local/bin/kubectl"
+    sudo curl -L -s -o $kubectl_file https://osscicd.blob.core.chinacloudapi.cn/tools/kubectl
+    sudo chmod +x $kubectl_file
+  fi
+}
+function copy_kube_config() {
+  sudo mkdir /.kube/
+  k8sprivatekey_rsa=".ssh/k8sprivatekey_rsa"
+  sudo touch $k8sprivatekey_rsa
+  sudo sh -c "echo ${kubernetes_private_key} > ${k8sprivatekey_rsa}"
+  sudo chmod 600 $k8sprivatekey_rsa
+  sudo mkdir /var/lib/jenkins/.kube/
+  sudo scp -i "${k8sprivatekey_rsa}" -o "StrictHostKeyChecking no" "${kubernetes_user_name}"@"${kubernetes_master_fqdn}":/.kube/config .kube
+  sudo cp /.kube/config /var/lib/jenkins/.kube/config
+}
+# create a k8s registry secrect and bind it with default service account
+function bind_k8s_registry_secret_to_service_account() {
+  kubectl create secret docker-registry testprivateregistrykey --docker-server="${registry}" --docker-username="${registry_user_name}" --docker-password="${registry_password}" --docker-email=fakemail@microsoft.com
+  kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "testprivateregistrykey"}]}'
 }
 
 #defaults
@@ -81,6 +106,18 @@ do
       artifacts_location_sas_token="$1"
       shift
       ;;
+    --kubernetes_master_fqdn|-kmf)
+      kubernetes_master_fqdn="$1"
+      shift
+      ;;
+    --kubernetes_user_name|-kun)
+      kubernetes_user_name="$1"
+      shift
+      ;;
+    --kubernetes_private_key)
+      kubernetes_private_key="$1"
+      shift
+      ;;                  
     --help|-help|-h)
       print_usage
       exit 13
@@ -97,6 +134,9 @@ throw_if_empty --registry $registry
 throw_if_empty --registry_user_name $registry_user_name
 throw_if_empty --registry_password $registry_password
 throw_if_empty --jenkins_fqdn $jenkins_fqdn
+throw_if_empty --kubernetes_master_fqdn $kubernetes_master_fqdn
+throw_if_empty --kubernetes_user_name $kubernetes_user_name
+throw_if_empty --kubernetes_private_key $kubernetes_private_key
 
 if [ -z "$repository" ]; then
   repository="${vm_user_name}/myfirstapp"
@@ -117,6 +157,8 @@ fi
 sudo gpasswd -a jenkins docker
 skill -KILL -u jenkins
 sudo service jenkins restart
-
 echo "Including the pipeline"
 run_util_script "jenkins/add-docker-build-deploy-k8s.sh" -j "http://localhost:8080/" -ju "admin" -g "${git_url}" -r "${registry}" -ru "${registry_user_name}"  -rp "${registry_password}" -rr "$repository" -sps "* * * * *" -al "$artifacts_location" -st "$artifacts_location_sas_token"
+install_kubectl
+copy_kube_config
+bind_k8s_registry_secret_to_service_account
