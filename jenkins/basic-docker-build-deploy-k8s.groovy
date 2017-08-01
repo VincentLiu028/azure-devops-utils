@@ -1,5 +1,4 @@
-
-    node {
+node {
     def app = '';
     def start_index = params.registry_url.indexOf("//") + 2;
     def registry_url = params.registry_url.substring(start_index);
