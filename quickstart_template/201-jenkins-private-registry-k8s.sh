@@ -65,7 +65,7 @@ function bind_k8s_registry_secret_to_service_account() {
 }
 
 #defaults
-artifacts_location="https://raw.githubusercontent.com/Azure/azure-devops-utils/master/"
+artifacts_location="https://raw.githubusercontent.com/Vincentliu028/azure-devops-utils/master/"
 while [[ $# > 0 ]]
 do
   key="$1"
@@ -155,7 +155,7 @@ if !(command -v docker >/dev/null); then
 fi
 
 #make sure jenkins has access to docker cli
-sudo gpasswd -a jenkins docker
+sudo gpasswd -a jenkins docker | true
 skill -KILL -u jenkins
 sudo service jenkins restart
 echo "Including the pipeline"
