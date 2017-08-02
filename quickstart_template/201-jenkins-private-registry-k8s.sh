@@ -52,10 +52,11 @@ function copy_kube_config() {
   sudo mkdir $kubconfigdir
   k8sprivatekey_rsa=/home/$vm_user_name/.ssh/k8sprivatekey_rsa
   sudo touch $k8sprivatekey_rsa
-  echo "${kubernetes_private_key}" | base64 -d | tee ${k8sprivatekey_rsa}
+  echo "${kubernetes_private_key}" | base64 -d | sudo tee ${k8sprivatekey_rsa}
   sudo chmod 400 $k8sprivatekey_rsa
   sudo mkdir /var/lib/jenkins/.kube/
-  sudo scp -i $k8sprivatekey_rsa -o "StrictHostKeyChecking no" $kubernetes_user_name@$kubernetes_master_fqdn:.kube/config $kubconfigdir
+  sudo scp -i $k8sprivatekey_rsa -o StrictHostKeyChecking=no $kubernetes_user_name@$kubernetes_master_fqdn:.kube/config $kubconfigdir
+  sudo chmod 666 $kubconfigdir/config
   sudo cp $kubconfigdir/config /var/lib/jenkins/.kube/config
 }
 # create a k8s registry secrect and bind it with default service account
