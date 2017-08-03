@@ -169,5 +169,6 @@ echo "Including the pipeline"
 run_util_script "jenkins/add-docker-build-deploy-k8s.sh" -j "http://localhost:8080/" -ju "admin" -g "${git_url}" -r "${registry}" -ru "${registry_user_name}"  -rp "${registry_password}" -rr "$repository" -sps "* * * * *" -al "$artifacts_location" -st "$artifacts_location_sas_token"
 install_kubectl
 copy_kube_config
+kubectl cluster-info
 bind_k8s_registry_secret_to_service_account
 echo "finish running all script"
