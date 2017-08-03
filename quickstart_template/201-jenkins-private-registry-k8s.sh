@@ -58,7 +58,6 @@ function copy_kube_config() {
   sudo scp -i $k8sprivatekey_rsa -o StrictHostKeyChecking=no $kubernetes_user_name@$kubernetes_master_fqdn:.kube/config $kubconfigdir
   sudo cp $kubconfigdir/config /var/lib/jenkins/.kube/config
   export KUBECONFIG=$kubconfigdir/config
-  echo "finish copy kubectl and configuration"
 }
 # create a k8s registry secrect and bind it with default service account
 function bind_k8s_registry_secret_to_service_account() {
@@ -169,6 +168,5 @@ echo "Including the pipeline"
 run_util_script "jenkins/add-docker-build-deploy-k8s.sh" -j "http://localhost:8080/" -ju "admin" -g "${git_url}" -r "${registry}" -ru "${registry_user_name}"  -rp "${registry_password}" -rr "$repository" -sps "* * * * *" -al "$artifacts_location" -st "$artifacts_location_sas_token"
 install_kubectl
 copy_kube_config
-echo $USER
 kubectl cluster-info
 bind_k8s_registry_secret_to_service_account
