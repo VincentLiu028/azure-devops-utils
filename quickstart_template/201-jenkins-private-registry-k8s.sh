@@ -48,15 +48,14 @@ function install_kubectl() {
   fi
 }
 function copy_kube_config() {
-  kubconfigdir=.kube
-  sudo mkdir $kubconfigdir
-  k8sprivatekey_rsa=.ssh/k8sprivatekey_rsa
+  kubconfigdir=/root/.kube
+  sudo mkdir -p $kubconfigdir
+  k8sprivatekey_rsa=/home/$vm_user_name/.ssh/k8sprivatekey_rsa
   sudo touch $k8sprivatekey_rsa
   echo "${kubernetes_private_key}" | base64 -d | sudo tee ${k8sprivatekey_rsa}
   sudo chmod 400 $k8sprivatekey_rsa
   sudo mkdir /var/lib/jenkins/.kube/
   sudo scp -i $k8sprivatekey_rsa -o StrictHostKeyChecking=no $kubernetes_user_name@$kubernetes_master_fqdn:.kube/config $kubconfigdir
-  sudo chmod 600 $kubconfigdir/config
   sudo cp $kubconfigdir/config /var/lib/jenkins/.kube/config
   echo "finish copy kubectl and configuration"
 }
@@ -172,4 +171,3 @@ copy_kube_config
 echo $USER
 kubectl cluster-info
 bind_k8s_registry_secret_to_service_account
-echo "finish running all script"
