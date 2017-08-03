@@ -48,7 +48,7 @@ function install_kubectl() {
   fi
 }
 function copy_kube_config() {
-  kubconfigdir=/root/.kube
+  kubconfigdir=$HOME/.kube
   sudo mkdir -p $kubconfigdir
   k8sprivatekey_rsa=/home/$vm_user_name/.ssh/k8sprivatekey_rsa
   sudo touch $k8sprivatekey_rsa
@@ -57,6 +57,7 @@ function copy_kube_config() {
   sudo mkdir /var/lib/jenkins/.kube/
   sudo scp -i $k8sprivatekey_rsa -o StrictHostKeyChecking=no $kubernetes_user_name@$kubernetes_master_fqdn:.kube/config $kubconfigdir
   sudo cp $kubconfigdir/config /var/lib/jenkins/.kube/config
+  export KUBECONFIG=$kubconfigdir/config
   echo "finish copy kubectl and configuration"
 }
 # create a k8s registry secrect and bind it with default service account
