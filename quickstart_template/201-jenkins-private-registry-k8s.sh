@@ -155,8 +155,10 @@ if !(command -v docker >/dev/null); then
   sudo curl -sSL https://get.docker.com/ | sh
 fi
 
+#sleep 5 seconds wait for docker to boot up
+sleep 5
 #make sure jenkins has access to docker cli
-sudo gpasswd -a jenkins docker | true
+sudo gpasswd -a jenkins docker
 skill -KILL -u jenkins
 sudo service jenkins restart
 echo "Including the pipeline"
