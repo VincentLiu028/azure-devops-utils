@@ -58,11 +58,15 @@ function copy_kube_config() {
   sudo scp -i $k8sprivatekey_rsa -o StrictHostKeyChecking=no $kubernetes_user_name@$kubernetes_master_fqdn:.kube/config $kubconfigdir
   sudo chmod 666 $kubconfigdir/config
   sudo cp $kubconfigdir/config /var/lib/jenkins/.kube/config
+  echo "finish copy kubectl and configuration"
 }
 # create a k8s registry secrect and bind it with default service account
 function bind_k8s_registry_secret_to_service_account() {
+  echo "start to execute to generate kubectl secrect"
+  echo "kubectl create secret docker-registry testprivateregistrykey --docker-server=${registry} --docker-username=${registry_user_name} --docker-password="${registry_password}" --docker-email=fakemail@microsoft.com" 
   kubectl create secret docker-registry testprivateregistrykey --docker-server="${registry}" --docker-username="${registry_user_name}" --docker-password="${registry_password}" --docker-email=fakemail@microsoft.com
   kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "testprivateregistrykey"}]}'
+  echo "finish execute kubectl secret"
 }
 
 #defaults
@@ -166,3 +170,4 @@ run_util_script "jenkins/add-docker-build-deploy-k8s.sh" -j "http://localhost:80
 install_kubectl
 copy_kube_config
 bind_k8s_registry_secret_to_service_account
+echo "finish running all script"
