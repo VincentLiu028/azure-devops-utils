@@ -61,11 +61,8 @@ function copy_kube_config() {
 }
 # create a k8s registry secrect and bind it with default service account
 function bind_k8s_registry_secret_to_service_account() {
-  echo "start to execute to generate kubectl secrect"
-  echo "kubectl create secret docker-registry testprivateregistrykey --docker-server=${registry} --docker-username=${registry_user_name} --docker-password="${registry_password}" --docker-email=fakemail@microsoft.com" 
   kubectl create secret docker-registry testprivateregistrykey --docker-server="${registry}" --docker-username="${registry_user_name}" --docker-password="${registry_password}" --docker-email=fakemail@microsoft.com
   kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "testprivateregistrykey"}]}'
-  echo "finish execute kubectl secret"
 }
 
 #defaults
