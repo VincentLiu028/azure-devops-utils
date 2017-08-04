@@ -47,6 +47,13 @@ function install_kubectl() {
     sudo chmod +x $kubectl_file
   fi
 }
+function install_docker_fromMirror() {
+  curl -fsSL https://mirror.azure.cn/docker-engine/apt/gpg | sudo apt-key add -
+  sudo add-apt-repository "deb [arch=amd64] https://mirror.azure.cn/docker-engine/apt/repo ubuntu-xenial main"
+  sudo apt-get update --fix-missing
+  apt-cache policy docker-engine
+  sudo apt-get install -y unzip docker-engine nginx apache2-utils
+}
 function copy_kube_config() {
   kubconfigdir=$HOME/.kube
   sudo mkdir -p $kubconfigdir
@@ -152,7 +159,7 @@ sudo apt-get install git --yes
 
 #install docker if not already installed
 if !(command -v docker >/dev/null); then
-  sudo curl -sSL https://get.docker.com/ | sh
+  install_docker_fromMirror
 fi
 
 #sleep 5 seconds wait for docker to boot up
