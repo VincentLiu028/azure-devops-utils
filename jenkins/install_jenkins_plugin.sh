@@ -1,3 +1,4 @@
+#reference https://gist.github.com/micw/e80d739c6099078ce0f3
 #!/usr/bin/env bash
 
 set -e
