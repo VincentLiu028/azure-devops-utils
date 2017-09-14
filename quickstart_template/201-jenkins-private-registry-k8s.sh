@@ -73,7 +73,8 @@ function bind_k8s_registry_secret_to_service_account() {
 }
 
 #defaults
-artifacts_location="https://raw.githubusercontent.com/Vincentliu028/azure-devops-utils/master/"
+artifacts_location="https://raw.githubusercontent.com/Vincentliu028/azure-devops-utils/sampleapp-eshop/"
+jenkins_version_location="https://raw.githubusercontent.com/Vincentliu028/azure-devops-utils/sampleapp-eshop/jenkins/jenkins-verified-ver"
 while [[ $# > 0 ]]
 do
   key="$1"
@@ -152,7 +153,7 @@ if [ -z "$repository" ]; then
 fi
 
 #install jenkins
-run_util_script "jenkins/install_jenkins.sh" -jf "${jenkins_fqdn}" -al "${artifacts_location}" -st "${artifacts_location_sas_token}"
+run_util_script "jenkins/install_jenkins.sh" -jf "${jenkins_fqdn}" -al "${artifacts_location}" -st "${artifacts_location_sas_token}" -jvl "${jenkins_version_location}"
 
 #install git
 sudo apt-get install git --yes
