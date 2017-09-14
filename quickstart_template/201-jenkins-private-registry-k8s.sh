@@ -64,6 +64,7 @@ function copy_kube_config() {
   sudo mkdir /var/lib/jenkins/.kube/
   sudo scp -i $k8sprivatekey_rsa -o StrictHostKeyChecking=no $kubernetes_user_name@$kubernetes_master_fqdn:.kube/config $kubconfigdir
   sudo cp $kubconfigdir/config /var/lib/jenkins/.kube/config
+  sudo chmod 775 /var/lib/jenkins/.kube/config
   export KUBECONFIG=$kubconfigdir/config
 }
 # create a k8s registry secrect and bind it with default service account
