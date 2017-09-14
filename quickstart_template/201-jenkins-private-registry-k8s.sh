@@ -74,8 +74,8 @@ function bind_k8s_registry_secret_to_service_account() {
 }
 
 #defaults
-artifacts_location="https://raw.githubusercontent.com/Vincentliu028/azure-devops-utils/mooncake-eshop/"
-jenkins_version_location="https://raw.githubusercontent.com/Vincentliu028/azure-devops-utils/mooncake-eshop/jenkins/jenkins-verified-ver"
+artifacts_location="https://raw.githubusercontent.com/Vincentliu028/azure-devops-utils/mooncake_eshop/"
+jenkins_version_location="https://raw.githubusercontent.com/Vincentliu028/azure-devops-utils/mooncake_eshop/jenkins/jenkins-verified-ver"
 while [[ $# > 0 ]]
 do
   key="$1"
